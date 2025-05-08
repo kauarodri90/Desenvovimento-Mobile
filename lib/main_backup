@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: FormularioCadastro(),
+    );
+  }
+}
+
+class FormularioCadastro extends StatefulWidget {
+  const FormularioCadastro({super.key});
+
+  @override
+  _FormularioCadastroState createState() => _FormularioCadastroState();
+}
+
+class _FormularioCadastroState extends State<FormularioCadastro> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _nomeController = TextEditingController();
+  final _sobrenomeController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _telefoneController = TextEditingController();
+
+  String? _sexoSelecionado;
+
+  DateTime? _dataNascimentoSelecionada;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Cadastro'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: <Widget>[
+              TextFormField(
+                controller: _nomeController,
+                decoration: InputDecoration(labelText: 'Nome'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira seu nome';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _sobrenomeController,
+                decoration: InputDecoration(labelText: 'Sobrenome'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira seu sobrenome';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'E-mail'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira seu e-mail';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _telefoneController,
+                decoration: InputDecoration(labelText: 'Telefone'),
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira seu telefone';
+                  }
+                  return null;
+                },
+              ),
+              DropdownButtonFormField<String>(
+                value: _sexoSelecionado,
+                items: <String>['Masculino', 'Feminino'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _sexoSelecionado = newValue;
+                  });
+                },
+                decoration: InputDecoration(labelText: 'Sexo'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, selecione o sexo';
+                  }
+                  return null;
+                },
+              ),
+              ListTile(
+                title: Text(
+                  _dataNascimentoSelecionada == null
+                      ? 'Data de Nascimento'
+                      : 'Data de Nascimento: ${DateFormat('dd/MM/yyyy').format(_dataNascimentoSelecionada!)}',
+                ),
+                trailing: Icon(Icons.calendar_today),
+                onTap: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null && picked != _dataNascimentoSelecionada) {
+                    setState(() {
+                      _dataNascimentoSelecionada = picked;
+                    });
+                  }
+                },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    print('Nome: ${_nomeController.text}');
+                    print('Sobrenome: ${_sobrenomeController.text}');
+                    print('E-mail: ${_emailController.text}');
+                    print('Telefone: ${_telefoneController.text}');
+                    print('Sexo: $_sexoSelecionado');
+                    print('Data de Nascimento: $_dataNascimentoSelecionada');
+                  }
+                },
+                child: Text('Cadastrar'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
