@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../models/usuario.dart';
+import '../repository/usuario_repository.dart';
 
 class CadastroPage extends StatefulWidget {
   @override
@@ -13,12 +14,17 @@ class _CadastroPageState extends State<CadastroPage> {
   final _senhaController = TextEditingController();
   final _confirmaSenhaController = TextEditingController();
 
-  void _cadastrarUsuario() {
+  final UsuarioRepository _usuarioRepository = UsuarioRepository();
+
+  void _cadastrarUsuario() async {
     if (_formKey.currentState!.validate()) {
-      usuarios.add({
-        'nome': _nomeController.text,
-        'email': _emailController.text,
-      });
+      final novoUsuario = Usuario(
+        nome: _nomeController.text,
+        email: _emailController.text,
+      );
+
+      await _usuarioRepository.criarUsuario(novoUsuario);
+
       Navigator.pushNamed(context, '/sucesso');
     }
   }
@@ -55,9 +61,8 @@ class _CadastroPageState extends State<CadastroPage> {
                 controller: _confirmaSenhaController,
                 decoration: InputDecoration(labelText: 'Confirme a Senha'),
                 obscureText: true,
-                validator: (value) => value != _senhaController.text
-                    ? 'As senhas não coincidem'
-                    : null,
+                validator: (value) =>
+                    value != _senhaController.text ? 'As senhas não coincidem' : null,
               ),
               SizedBox(height: 20),
               ElevatedButton(
